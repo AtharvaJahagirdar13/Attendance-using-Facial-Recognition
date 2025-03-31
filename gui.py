@@ -2,12 +2,13 @@ import os
 import cv2
 import tkinter as tk
 from tkinter import messagebox, simpledialog
+
+import self
 from PIL import Image, ImageTk
 import face_recognition
-import numpy as np
-from liveness import eye_aspect_ratio
+import sys
+import subprocess
 # Optionally import additional modules (e.g., db_manage, student_db_manager) if you want to log attendance
-
 # Ensure the faces folder exists
 if not os.path.exists("faces"):
     os.makedirs("faces")
@@ -88,6 +89,11 @@ class AttendanceGUI:
             else:
                 messagebox.showwarning("Registration", "Registration cancelled; no name entered.")
 
+    def back_to_home(self):
+        """Close this window and open home.py."""
+        self.root.destroy()
+        subprocess.run([sys.executable, "home.py"])
+
     def __del__(self):
         if self.video_capture.isOpened():
             self.video_capture.release()
@@ -96,3 +102,7 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = AttendanceGUI(root)
     root.mainloop()
+
+self.btn_register.grid(row=1, column=0, pady=10, padx=10, sticky="ew")
+self.btn_home.grid(row=2, column=0, pady=10, padx=10, sticky="ew")
+

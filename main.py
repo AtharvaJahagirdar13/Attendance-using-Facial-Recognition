@@ -34,8 +34,8 @@ for file in os.listdir(faces_folder):
 students = known_face_names.copy()
 
 # --- Initialize Database Managers ---
-db = DBManager(host="localhost", user="root", passwd="Anj@130206", db="attendance_db")
-student_db = StudentDBManager(host="localhost", user="root", passwd="Anj@130206", db="attendance_db")
+db = DBManager(host="localhost", user="root", passwd="AnkitaGadre18", db="attendance_db")
+student_db = StudentDBManager(host="localhost", user="root", passwd="AnkitaGadre18", db="attendance_db")
 
 # Initialize video capture from the default webcam
 video_capture = cv2.VideoCapture(0)
