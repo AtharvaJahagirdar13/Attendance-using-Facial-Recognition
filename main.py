@@ -3,13 +3,14 @@ import face_recognition
 import cv2
 import numpy as np
 from datetime import datetime
-from liveness import eye_aspect_ratio         # Blink detection helper
-from  age_gender import predict_age_gender       # Age and gender prediction helper
-from db_manage import DBManager                # Attendance records manager
-from student_db_manager import StudentDBManager # Student details manager
+from liveness import eye_aspect_ratio  # Blink detection helper
+from age_gender import predict_age_gender  # Age and gender prediction helper
+from db_manage import DBManager  # Attendance records manager
+from student_db_manager import StudentDBManager  # Student details manager
 
 # Set an eye aspect ratio threshold to detect a blink (for liveness detection)
 EYE_AR_THRESH = 0.25
+
 # --- Load All Known Faces ---
 known_face_encodings = []
 known_face_names = []
@@ -33,8 +34,8 @@ for file in os.listdir(faces_folder):
 students = known_face_names.copy()
 
 # --- Initialize Database Managers ---
-db = DBManager(host="localhost", user="root", passwd="AnkitaGadre18", db="attendance_db")
-student_db = StudentDBManager(host="localhost", user="root", passwd="AnkitaGadre18", db="attendance_db")
+db = DBManager(host="localhost", user="root", passwd="Anj@130206", db="attendance_db")
+student_db = StudentDBManager(host="localhost", user="root", passwd="Anj@130206", db="attendance_db")
 
 # Initialize video capture from the default webcam
 video_capture = cv2.VideoCapture(0)
@@ -77,13 +78,37 @@ while True:
         else:
             name = "Unknown"
 
-        # Only proceed if the face is recognized
+        # If the face is unknown, prompt for registration
+        if name == "Unknown":
+            cv2.putText(frame, "Unknown Face! Press 'r' to register.", (left, top - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            # Check if the user pressed 'r' for registration
+            if cv2.waitKey(1) & 0xFF == ord('r'):
+                new_name = input("Enter your name for registration: ").strip()
+                if new_name:
+                    # Save the face region from the original frame
+                    new_filename = f"{new_name}_image.jpg"
+                    save_path = os.path.join(faces_folder, new_filename)
+                    face_roi = frame[top:bottom, left:right]
+                    cv2.imwrite(save_path, face_roi)
+                    print(f"Saved new face for {new_name} at {save_path}")
+
+                    # Compute and store the new face encoding
+                    new_image = face_recognition.load_image_file(save_path)
+                    new_encodings = face_recognition.face_encodings(new_image)
+                    if new_encodings:
+                        known_face_encodings.append(new_encodings[0])
+                        known_face_names.append(new_name)
+                    else:
+                        print("Face encoding not found. Registration failed.")
+                    # Update name so further processing uses the new registered name
+                    name = new_name
+
+        # For recognized faces, perform liveness detection via blink check
         if name in known_face_names:
-            # Initialize blink status for the recognized face if not set
             if name not in blink_status:
                 blink_status[name] = False
 
-            # Liveness detection using blink check
             if i < len(landmarks_list):
                 landmarks = landmarks_list[i]
                 left_eye = landmarks.get('left_eye', [])
@@ -101,18 +126,15 @@ while True:
                             cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 3)
                 if name in students:
                     students.remove(name)
-                    # Get current date and time strings
                     date_str = datetime.now().strftime("%Y-%m-%d")
                     time_str = datetime.now().strftime("%H:%M:%S")
-                    # Insert attendance record into the attendance table
                     db.insert_attendance(name, date_str, time_str)
-                    # Extract the face region of interest (ROI) from the original frame
+                    # Optionally, you can predict age and gender if you have the model available
                     face_roi = frame[top:bottom, left:right]
                     if face_roi.size != 0:
                         age, gender = predict_age_gender(face_roi)
                     else:
                         age, gender = "N/A", "N/A"
-                    # Insert or update student details (age, gender) in the student_details table
                     student_db.insert_or_update_student(name, age, gender)
 
     # Display the resulting video frame
@@ -122,6 +144,6 @@ while True:
 
 # Cleanup
 video_capture.release()
-cv2.destroyWindow()
+cv2.destroyAllWindows()
 db.close()
 student_db.close()
