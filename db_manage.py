@@ -1,7 +1,6 @@
-import MySQLdb
-
+import mysql.connector as MySQLdb
 class DBManager:
-    def __init__(self, host="localhost", user="root", passwd="your_password", db="attendance_db"):
+    def __init__(self, host="localhost", user="root", passwd="AnkitaGadre18", db="attendance_db"):
         self.conn = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
         self.cursor = self.conn.cursor()
         self.create_table()

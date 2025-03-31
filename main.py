@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from datetime import datetime
 from liveness import eye_aspect_ratio         # Blink detection helper
-from age_gender import predict_age_gender       # Age and gender prediction helper
+from  age_gender import predict_age_gender       # Age and gender prediction helper
 from db_manage import DBManager                # Attendance records manager
 from student_db_manager import StudentDBManager # Student details manager
 
@@ -33,8 +33,8 @@ for file in os.listdir(faces_folder):
 students = known_face_names.copy()
 
 # --- Initialize Database Managers ---
-db = DBManager(host="localhost", user="root", passwd="Anj@130206", db="attendance_db")
-student_db = StudentDBManager(host="localhost", user="root", passwd="Anj@130206", db="attendance_db")
+db = DBManager(host="localhost", user="root", passwd="AnkitaGadre18", db="attendance_db")
+student_db = StudentDBManager(host="localhost", user="root", passwd="AnkitaGadre18", db="attendance_db")
 
 # Initialize video capture from the default webcam
 video_capture = cv2.VideoCapture(0)

@@ -4,8 +4,17 @@ import os
 
 # Construct absolute paths to the models in the "models" folder.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-AGE_PROTO = os.path.join(BASE_DIR, "models", "age_deploy.prototxt")
-AGE_MODEL = os.path.join(BASE_DIR, "models", "age_net.caffemodel")
+import os
+
+AGE_PROTO = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "age_deploy.prototxt")
+AGE_MODEL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "age_net.caffemodel")
+
+print(f"AGE_PROTO Path: {AGE_PROTO}")
+print(f"AGE_PROTO Exists: {os.path.exists(AGE_PROTO)}")
+
+print(f"AGE_MODEL Path: {AGE_MODEL}")
+print(f"AGE_MODEL Exists: {os.path.exists(AGE_MODEL)}")
+
 GENDER_PROTO = os.path.join(BASE_DIR, "models", "gender_deploy.prototxt")
 GENDER_MODEL = os.path.join(BASE_DIR, "models", "gender_net.caffemodel")
 
@@ -14,8 +23,8 @@ ORIGINAL_AGE_LIST = ['(0-2)', '(4-6)', '(8-12)', '(15-20)', '(25-32)', '(38-43)'
 GENDER_LIST = ['Male', 'Female']
 
 # Load the pre-trained networks using OpenCV's DNN module
-age_net = cv2.dnn.readNetFromCaffe(AGE_PROTO, AGE_MODEL)
-gender_net = cv2.dnn.readNetFromCaffe(GENDER_PROTO, GENDER_MODEL)
+age_net = cv2.dnn.readNetFromCaffe(AGE_PROTO,AGE_MODEL)
+gender_net = cv2.dnn.readNetFromCaffe(GENDER_PROTO,GENDER_MODEL)
 
 def map_age_bucket(predicted_age):
     """
