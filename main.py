@@ -1,11 +1,16 @@
 import os
+import subprocess
+import sys
 import face_recognition
 import cv2
 import numpy as np
 from datetime import datetime
+import tkinter as tk
+
 from liveness import eye_aspect_ratio  # Blink detection helper
 from age_gender import predict_age_gender  # Age and gender prediction helper
 from db_manage import DBManager  # Attendance records manager
+from tkinter import messagebox
 from student_db_manager import StudentDBManager  # Student details manager
 
 # Set an eye aspect ratio threshold to detect a blink (for liveness detection)
@@ -15,6 +20,27 @@ EYE_AR_THRESH = 0.25
 known_face_encodings = []
 known_face_names = []
 faces_folder = "faces"
+
+def show_attendance_popup(name):
+    popup = tk.Tk()
+    popup.title("Attendance")
+    popup.geometry("300x150")
+
+    label = tk.Label(popup, text=f"{name} marked present!", font=("Arial", 12))
+    label.pack(pady=10)
+
+    def go_back():
+        subprocess.Popen([sys.executable, "home.py"])
+        popup.destroy()  # Close the popup first
+        video_capture.release()  # Ensure camera is released
+        cv2.destroyAllWindows()  # Close OpenCV windows
+         # Open home.py
+
+    back_button = tk.Button(popup, text="Back", command=go_back, font=("Arial", 10), bg="lightblue")
+    back_button.pack(pady=10)
+
+    popup.mainloop()
+
 
 # Loop over image files in the faces folder
 for file in os.listdir(faces_folder):
@@ -136,6 +162,7 @@ while True:
                     else:
                         age, gender = "N/A", "N/A"
                     student_db.insert_or_update_student(name, age, gender)
+                    show_attendance_popup(name)
 
     # Display the resulting video frame
     cv2.imshow("Attendance", frame)
